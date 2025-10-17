@@ -94,18 +94,43 @@ bot.command('viewkey', async (ctx) => {
     
     if (response.data.success == true ) {
       const retrievedApiKey = response.data.data.key;
-      const createdAt = response.data.data.createdAt;
-      const updatedAt = response.data.data.updatedAt;
-      const lastUsedAt = response.data.data.lastUsedAt;
+      // Convert timestamps to GMT+7 (Jakarta) timezone
+      const createdAt = new Date(response.data.data.createdAt).toLocaleString('en-GB', { 
+        timeZone: 'Asia/Jakarta',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      const updatedAt = new Date(response.data.data.updatedAt).toLocaleString('en-GB', { 
+        timeZone: 'Asia/Jakarta',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+      const lastUsedAt = new Date(response.data.data.lastUsedAt).toLocaleString('en-GB', { 
+        timeZone: 'Asia/Jakarta',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
       
       return ctx.reply(`Here is your API key:
 
 ${retrievedApiKey}
 
 Key Information:
-- Created: ${createdAt}
-- Last Updated: ${updatedAt}
-- Last Used: ${lastUsedAt}
+- Created: ${createdAt} (GMT+7 Jakarta)
+- Last Updated: ${updatedAt} (GMT+7 Jakarta)
+- Last Used: ${lastUsedAt} (GMT+7 Jakarta)
 
 Keep this key secure and don't share it with anyone!
 Use /recreate to regenerate your key.`);
