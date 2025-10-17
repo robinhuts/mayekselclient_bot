@@ -45,7 +45,7 @@ Your API key is: ${response.data.data.apiKey}
 
 Please save this API key securely as we don't store it locally. You'll need it for /viewkey and /recreate commands.
 
-Join sini: https://t.me/mayeksel`);
+Join Grup : https://t.me/cooking_mayeksel`);
 
       } else {
         console.error('API response does not contain expected data structure:', response.data);
