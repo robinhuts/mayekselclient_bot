@@ -49,9 +49,13 @@ npm run dev
 ## Bot Commands
 
 - `/start` - Register for the service or check if already registered
-- `/viewkey` - View your API key and key information (usage: /viewkey [your_api_key])
+- `/viewkey` - View your API key and key information with timestamps in GMT+7 (Jakarta) timezone
 - `/recreate` - Regenerate your API key (usage: /recreate [your_api_key])
 - `/help` - Display help information about the bot commands
+
+## Features
+
+- **GMT+7 Timestamps**: All timestamps (created, updated, last used) displayed in /viewkey command are automatically converted to GMT+7 (Jakarta) timezone for better readability.
 
 ## Database
 
