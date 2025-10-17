@@ -40,9 +40,12 @@ bot.start(async (ctx) => {
       if (response.data.data && response.data.data.apiKey) {
 
         return ctx.reply(`Welcome, @${telegramUser.username}! You have been successfully registered in our system.
-          Your API key is: ${response.data.data.apiKey}
-          Please save this API key securely as we don't store it locally. You'll need it for /viewkey and /recreate commands.
-          Join our channel for updates: https://t.me/mayeksel`);
+
+Your API key is: ${response.data.data.apiKey}
+
+Please save this API key securely as we don't store it locally. You'll need it for /viewkey and /recreate commands.
+
+Join sini: https://t.me/mayeksel`);
 
       } else {
         console.error('API response does not contain expected data structure:', response.data);
@@ -52,8 +55,7 @@ bot.start(async (ctx) => {
       if (response.data.code === 409) {
         return ctx.reply(`Welcome back, @${telegramUser.username}! You are already registered in our system. Use /viewkey to view your key, or /recreate to regenerate it
 
-Our services are not affiliated with any others.
-Trust yourself!`);
+Join our channel for updates: https://t.me/mayeksel`);
       } else {
         console.error('API error during user registration:', response.data);
         return ctx.reply('Sorry, there was an error processing your registration. Please try again later.');
@@ -82,19 +84,19 @@ Join our channel for updates: https://t.me/mayeksel`);
 // Handle view API key request
 bot.command('viewkey', async (ctx) => {
   const telegramUser = ctx.from;
-  
+  const telegramId = telegramUser.id
+
   try {
-    // Use x-api-key header for authentication
-    const response = await apiClient.get(`api/user/telegram/${telegramUser.id.toString()}/key`, {
+    const response = await apiClient.get(`/user/telegram/${telegramId.toString()}/key`, {
     });
 
-    console.log(response)
+    console.log(response.data)
     
-    if (response.data.success && response.data.data && Array.isArray(response.data.data) && response.data.data.length > 0 && response.data.data[0].key) {
-      const retrievedApiKey = response.data.data[0].key;
-      const createdAt = response.data.data[0].createdAt;
-      const updatedAt = response.data.data[0].updatedAt;
-      const lastUsedAt = response.data.data[0].lastUsedAt;
+    if (response.data.success == true ) {
+      const retrievedApiKey = response.data.data.key;
+      const createdAt = response.data.data.createdAt;
+      const updatedAt = response.data.data.updatedAt;
+      const lastUsedAt = response.data.data.lastUsedAt;
       
       return ctx.reply(`Here is your API key:
 
@@ -120,44 +122,42 @@ Use /recreate to regenerate your key.`);
 // Handle recreate API key request  
 bot.command('recreate', async (ctx) => {
   const telegramUser = ctx.from;
-  
-  if (!telegramUser.username) {
-    return ctx.reply('Sorry, you need to set a username in Telegram before you can recreate your API key.');
-  }
-  
-  const args = ctx.message.text.split(' ');
-  
-  if (args.length < 2) {
-    return ctx.reply('To regenerate your API key, please provide your current API key.\n\nUsage: /recreate [your_api_key]\n\nFor example: /recreate abc123def456');
-  }
-  
-  const providedApiKey = args[1];
-  
+  const telegramId = telegramUser.id;
+
   try {
-    // Use the new endpoint with x-api-key header for authentication
-    const response = await apiClient.put(`/user/me/keys/${telegramUser.username}/recreate`, {}, {
-      headers: {
-        'x-api-key': providedApiKey
-      }
+    const keyResponse = await apiClient.get(`/user/telegram/${telegramId.toString()}/key`, {
     });
-    
-    if (response.data.success && response.data.data.key) {
-      const newApiKey = response.data.data.key;
+
+    if (keyResponse.data.success && keyResponse.data.data && keyResponse.data.data.key) {
+      const currentApiKey = keyResponse.data.data.key;
+
+      const response = await apiClient.put(`/user/me/keys/${telegramUser.username}/recreate`, {}, {
+        headers: {
+          'x-api-key': currentApiKey
+        }
+      });
       
-      return ctx.reply(`Your API key has been successfully regenerated.
+      if (response.data.success && response.data.data.key) {
+        const newApiKey = response.data.data.key;
+        
+        return ctx.reply(`Your API key has been successfully regenerated.
 
 Your new API key is:
 
 ${newApiKey}
 
 Keep this key secure and don't share it with anyone!`);
+      } else {
+        console.error('API response does not contain expected data structure:', response.data);
+        return ctx.reply('Sorry, we could not regenerate your API key. Please try again later.');
+      }
     } else {
-      console.error('API response does not contain expected data structure:', response.data);
-      return ctx.reply('Sorry, we could not regenerate your API key. Please try again later.');
+      console.error('Could not retrieve current API key for user:', keyResponse.data);
+      return ctx.reply('Sorry, we could not authenticate your request. Please contact support or try /start to register again.');
     }
   } catch (error) {
     console.error('Error regenerating API key:', error.response ? error.response.data : error.message);
-    return ctx.reply('Sorry, there was an error regenerating your API key. Please check your API key and try again.');
+    return ctx.reply('Sorry, there was an error regenerating your API key. Please try again later.');
   }
 });
 
@@ -167,8 +167,8 @@ bot.help((ctx) => {
 
 Commands:
 /start - Register for the service
-/viewkey - View your API key details (usage: /viewkey [your_api_key])
-/recreate - Regenerate your API key (usage: /recreate [your_api_key])`);
+/viewkey - View your API key details
+/recreate - Regenerate your API key`);
 });
 
 // Error handling
