@@ -49,27 +49,13 @@ npm run dev
 ## Bot Commands
 
 - `/start` - Register for the service or check if already registered
-- `/viewkey` - View your API key and key information
-- `/recreate` - Regenerate your API key
+- `/viewkey` - View your API key and key information (usage: /viewkey [your_api_key])
+- `/recreate` - Regenerate your API key (usage: /recreate [your_api_key])
 - `/help` - Display help information about the bot commands
 
 ## Database
 
-The bot uses SQLite to store user information locally. The database file `telegram-bot.db` will be automatically created when the bot starts.
-
-### Database Schema
-
-The database contains a single table `users` with the following structure:
-
-```sql
-CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  telegram_id INTEGER UNIQUE NOT NULL,
-  username TEXT UNIQUE NOT NULL,
-  api_key TEXT NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
+The bot no longer uses a local database to store user information. API keys are not stored locally and must be provided with each request to /viewkey or /recreate commands.
 ```
 
 ## License
