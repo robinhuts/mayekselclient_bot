@@ -29,7 +29,7 @@ bot.start(async (ctx) => {
   }
   
   try {
-    const response = await apiClient.post('/user/register-telegram', {
+    const response = await apiClient.post('api/user/register-telegram', {
       username: telegramUser.username,
       telegramId: telegramUser.id.toString(),
       role: "user"
@@ -87,7 +87,7 @@ bot.command('viewkey', async (ctx) => {
   const telegramId = telegramUser.id
 
   try {
-    const response = await apiClient.get(`/user/telegram/${telegramId.toString()}/key`, {
+    const response = await apiClient.get(`api/user/telegram/${telegramId.toString()}/key`, {
     });
 
     console.log(response.data)
@@ -150,13 +150,13 @@ bot.command('recreate', async (ctx) => {
   const telegramId = telegramUser.id;
 
   try {
-    const keyResponse = await apiClient.get(`/user/telegram/${telegramId.toString()}/key`, {
+    const keyResponse = await apiClient.get(`api/user/telegram/${telegramId.toString()}/key`, {
     });
 
     if (keyResponse.data.success && keyResponse.data.data && keyResponse.data.data.key) {
       const currentApiKey = keyResponse.data.data.key;
 
-      const response = await apiClient.put(`/user/me/keys/${telegramUser.username}/recreate`, {}, {
+      const response = await apiClient.put(`api/user/me/keys/${telegramUser.username}/recreate`, {}, {
         headers: {
           'x-api-key': currentApiKey
         }
@@ -189,7 +189,8 @@ Keep this key secure and don't share it with anyone!`);
 // Handle health check command
 bot.command('health', async (ctx) => {
   try {
-    const response = await axios.get('http://api.axios.lol/health');
+    const response = await apiClient.get('/health')
+    console.log(response)
     
     if (response.data.success) {
       const healthData = response.data.data;
