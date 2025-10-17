@@ -65,7 +65,7 @@ Join our channel for updates: https://t.me/mayeksel`);
     if (error.response) {
       if (error.response.status === 409) {
         return ctx.reply(`Welcome back, @${telegramUser.username}! You are already registered in our system. Use /viewkey to view your key.
-        
+
 Join our channel for updates: https://t.me/mayeksel`);
       } else {
         console.error('API error during user registration:', error.response.data);
@@ -128,9 +128,9 @@ bot.command('viewkey', async (ctx) => {
 ${retrievedApiKey}
 
 Key Information:
-- Created: ${createdAt} (GMT+7 Jakarta)
-- Last Updated: ${updatedAt} (GMT+7 Jakarta)
-- Last Used: ${lastUsedAt} (GMT+7 Jakarta)
+- Created: ${createdAt}
+- Last Updated: ${updatedAt}
+- Last Used: ${lastUsedAt}
 
 Keep this key secure and don't share it with anyone!
 Use /recreate to regenerate your key.`);
@@ -186,6 +186,28 @@ Keep this key secure and don't share it with anyone!`);
   }
 });
 
+// Handle health check command
+bot.command('health', async (ctx) => {
+  try {
+    const response = await axios.get('http://api.axios.lol/health');
+    
+    if (response.data.success) {
+      const healthData = response.data.data;
+      return ctx.reply(`🟢 Crypto API Health Status:
+
+Status: ${healthData.status}
+Latency: ${healthData.latency}
+Timestamp: ${new Date(healthData.timestamp).toLocaleString()}
+Message: ${response.data.message}`);
+    } else {
+      return ctx.reply('🔴 API Health Check: Service is not responding properly');
+    }
+  } catch (error) {
+    console.error('Error during health check:', error.message);
+    return ctx.reply('🔴 API Health Check: Unable to connect to the service');
+  }
+});
+
 // Handle help command
 bot.help((ctx) => {
   ctx.reply(`This bot allows you to register for our service using your Telegram username.
@@ -193,7 +215,8 @@ bot.help((ctx) => {
 Commands:
 /start - Register for the service
 /viewkey - View your API key details
-/recreate - Regenerate your API key`);
+/recreate - Regenerate your API key
+/health - Check API health status`);
 });
 
 // Error handling
